@@ -89,8 +89,20 @@ class ACMOJClient:
         if result and 'id' in result:
             self._save_submission_id(result['id'])
 
-        return result
 
+    def submit_code(self, problem_id: int, language: str, code_text: str) -> Optional[Dict]:
+        """Submit source code or git URL depending on language.
+
+        When language == 'git', the code_text should be a repository URL.
+        Otherwise, code_text is the actual source content.
+        """
+        if language.lower() == 'git':
+            return self.submit_git(problem_id, code_text)
+        data = {"language": language, "code": code_text}
+        result = self._make_request("POST", f"/problem/{problem_id}/submit", data=data)
+        if result and 'id' in result:
+            self._save_submission_id(result['id'])
+        return result
     def get_submission_detail(self, submission_id: int) -> Optional[Dict]:
         return self._make_request("GET", f"/submission/{submission_id}")
 
@@ -106,7 +118,7 @@ def main():
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     # Submit C++ source file
-    submit_parser = subparsers.add_parser("submit", help="Submit a C++ source file")
+    submit_parser = subparsers.add_parser("submit", help="Submit code or git repo URL")
     submit_parser.add_argument("--problem-id", type=int, required=True, help="Problem ID")
     submit_parser.add_argument("--language", type=str, required=True,
                                help="Programming language (e.g., cpp, c, python)")
@@ -130,15 +142,18 @@ def main():
     client = ACMOJClient(args.token)
 
     if args.command == "submit":
-        try:
-            with open(args.code_file, 'r', encoding='utf-8') as f:
-                code_text = f.read()
-        except FileNotFoundError:
-            print(f"Error: Code file not found at {args.code_file}")
-            exit(1)
-        except Exception as e:
-            print(f"Error: Failed to read code file: {e}")
-            exit(1)
+        if args.language.lower() == 'git':
+            code_text = args.code_file
+        else:
+            try:
+                with open(args.code_file, 'r', encoding='utf-8') as f:
+                    code_text = f.read()
+            except FileNotFoundError:
+                print(f"Error: Code file not found at {args.code_file}")
+                exit(1)
+            except Exception as e:
+                print(f"Error: Failed to read code file: {e}")
+                exit(1)
 
         result = client.submit_code(args.problem_id, args.language, code_text)
 
