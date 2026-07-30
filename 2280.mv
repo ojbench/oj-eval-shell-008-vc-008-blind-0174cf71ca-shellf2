@@ -1,0 +1,13 @@
+A<I
+B<0
+C<10
+# output hundreds tens units of ASCII(A)
+D<A
+E<100
+F<[D+156]
+O<F
+G<[D+150]
+O<G
+H<[D+144]
+O<H
+Z<1
