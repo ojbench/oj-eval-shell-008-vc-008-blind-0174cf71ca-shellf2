@@ -88,7 +88,7 @@ class ACMOJClient:
         result = self._make_request("POST", f"/problem/{problem_id}/submit", data=data)
         if result and 'id' in result:
             self._save_submission_id(result['id'])
-
+        return result
 
     def submit_code(self, problem_id: int, language: str, code_text: str) -> Optional[Dict]:
         """Submit source code or git URL depending on language.
@@ -103,6 +103,7 @@ class ACMOJClient:
         if result and 'id' in result:
             self._save_submission_id(result['id'])
         return result
+
     def get_submission_detail(self, submission_id: int) -> Optional[Dict]:
         return self._make_request("GET", f"/submission/{submission_id}")
 
