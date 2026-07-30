@@ -33,7 +33,7 @@ class ACMOJClient:
         self.api_base = os.environ.get("OJ_API_BASE", "https://acm.sjtu.edu.cn/OnlineJudge/api/v1")
         self.headers = {
             "Authorization": f"Bearer {access_token}",
-            "Content-Type": "application/x-www-form-urlencoded",
+            "Content-Type": "application/json",
             "User-Agent": "ACMOJ-Python-Client/2.2"
         }
 
@@ -47,7 +47,7 @@ class ACMOJClient:
             if method.upper() == "GET":
                 response = requests.get(url, headers=self.headers, params=params, timeout=10)
             elif method.upper() == "POST":
-                response = requests.post(url, headers=self.headers, data=data, timeout=10)
+                response = requests.post(url, headers=self.headers, json=data, timeout=10)
             else:
                 print(f"Unsupported HTTP method: {method}")
                 return None
